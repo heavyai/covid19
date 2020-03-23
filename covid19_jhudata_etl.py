@@ -124,7 +124,7 @@ def transform_daily_covid_data(daily_report_dfs: Dict[str, pd.DataFrame]) -> Dic
 
 @task
 def cleanup_files():
-    """Task to remove the source files"""
+    """Remove the source files to avoid cluttering the run directory"""
 
     logger = prefect.context.get("logger")
     for fn in DATASOURCE_JHU_GITHUB:
@@ -147,7 +147,6 @@ with Flow('COVID 19 flow', schedule=daily_schedule) as flow:
     daily_covid_data = transform_daily_covid_data(file_dfs)
     
     #load - add a load task and include it here
-
     cleanup_files()
 
 flow.run()
