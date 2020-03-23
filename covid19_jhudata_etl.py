@@ -1,5 +1,3 @@
-#!/home/venkat/miniconda3/bin/python
-
 import pandas as pd
 import wget
 import prefect
@@ -127,7 +125,7 @@ def transform_daily_covid_data(daily_report_dfs: Dict[str, pd.DataFrame]) -> Dic
 @task
 def cleanup_files():
     """Task to remove the source files"""
-    
+
     logger = prefect.context.get("logger")
     for fn in DATASOURCE_JHU_GITHUB:
         if path.exists(DATASOURCE_JHU_GITHUB[fn]):
