@@ -23,6 +23,8 @@ DATASOURCE_JHU_GITHUB = {   "confirmed":'time_series_19-covid-Confirmed.csv',\
 
 @task
 def extract_gh_global_covid_ts_data() -> Dict[str, pd.DataFrame]:
+    """Extract the 3 time series files and load into pandas dataframes for transformation"""
+
     logger = prefect.context.get("logger")
 
     dfs={}
@@ -42,7 +44,6 @@ def extract_gh_global_covid_ts_data() -> Dict[str, pd.DataFrame]:
 
 @task
 def transform_daily_covid_data(daily_report_dfs: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
-    
     """Consolidate the 3 time series files into one, and compute daily increments as well as filter out empty rows"""
     logger = prefect.context.get("logger")
 
@@ -125,6 +126,8 @@ def transform_daily_covid_data(daily_report_dfs: Dict[str, pd.DataFrame]) -> Dic
 
 @task
 def cleanup_files():
+    """Task to remove the source files"""
+    
     logger = prefect.context.get("logger")
     for fn in DATASOURCE_JHU_GITHUB:
         if path.exists(DATASOURCE_JHU_GITHUB[fn]):
@@ -135,6 +138,7 @@ def cleanup_files():
 #run 4pm and 5pm daily
 daily_schedule = Schedule(clocks=[CronClock("30 1,2 * * *")])
 
+#Set up a prefect flow and run it on a schedule
 with Flow('COVID 19 flow', schedule=daily_schedule) as flow:
 
     #extract tasks
