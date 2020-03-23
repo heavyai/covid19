@@ -9,6 +9,5 @@ ETL code for the covid19 dashboard at https://www.omnisci.com/demos/covid-19
 ## Installing deps with conda
 
 ```
-conda install -c conda-forge prefect
-conda install -c conda-forge pymapd
+conda install -c conda-forge prefect pymapd
 ```
