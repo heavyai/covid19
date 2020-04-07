@@ -1,0 +1,62 @@
+output-directory = "covid19-flow-outputs"
+
+[context.secrets]
+s3_bucket_name='mapd-data-uswest2' #change
+
+[results]
+result_dir = '~/.prefect/results'
+result_db = 'results.db'
+
+#Each loader for covid19 data is configured below. 
+#To add a new loader, add a new config section [sources.your_new_source]
+
+[sources.worldometer]
+    description = "Worldometer daily data, pulled from https://www.worldometers.info/coronavirus/"
+    url = "https://www.worldometers.info/coronavirus/"
+    file_prefix='worldometer'
+    result_table ='worldometer'
+    cron_string = "* * * * *"
+
+[sources.jhu]
+    source_file_name = 'time_series_covid19'
+    url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/'
+    file_prefix='jhu-daily'
+    result_table ='jhu'
+    locations = ['global'] #or ['global', 'US']
+    file_types = ['testing','confirmed','deaths']
+    cron_string = "* * * * *"
+
+[sources.covid19trackingproject]
+    url = 'https://covidtracking.com/api/states/daily'
+    file_prefix='covid19tp'
+    result_table ='c19tp'
+    cron_string = "* * * * *"
+    
+[sources.nytimes]
+    url= 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/'
+    file_prefix='nytimes_daily'
+    result_table ='nytimes_daily'
+    cron_string = "* * * * *"
+
+[sources.bing]
+
+#Ideally move the below into a secrets file
+[[destinations.omnisci]]
+host="leviathan.mapd.com"
+user="admin"
+password="HyperInteractive"
+dbname="omnisci"
+port="5274"
+protocol="binary"
+
+[[destinations.omnisci]]
+host="bewdy.mapd.com"
+user="venkat"
+password="HyperInteractive"
+dbname="covid19"
+port="6274"
+protocol="binary"
+
+[[destinations.aws]]
+autoscaling_groups = [{asg_name= 'demo-covid19',asg_region= 'us-west-2'},{asg_name= 'demo-covid19',asg_region= 'eu-central-1'}]
+connection_params = {user="admin",password="HyperInteractive",dbname="omnisci",port="6274",protocol="binary"}
